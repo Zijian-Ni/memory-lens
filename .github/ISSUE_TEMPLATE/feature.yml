@@ -1,0 +1,37 @@
+name: Feature request
+description: A new signal, parser shape, or viewer view
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of request is this?
+      options:
+        - New decay signal
+        - Parser / provenance improvement
+        - Duplicate detection tweak
+        - Viewer change
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why this matters
+      description: Who is blocked without it, and what do they do today instead?
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: Synthetic example
+      render: markdown
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Constraints acknowledged
+      options:
+        - label: This can be done with zero runtime dependencies (Node built-ins only)
+        - label: Decay must remain a review list, never a delete list
+        - label: Similarity stays lexical unless an optional offline layer is explicitly scoped
+        - label: I am willing to contribute a synthetic fixture

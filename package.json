@@ -1,0 +1,47 @@
+{
+  "name": "memory-lens",
+  "version": "0.1.0",
+  "description": "Inspect and prune long-lived agent memory. Local-first, no embeddings, no backend. You cannot trust an agent's memory you have never read.",
+  "author": "Zijian Ni <xiaoni112233@outlook.com>",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "memory-lens": "src/cli.js"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "index.html",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "bench:dupes": "node scripts/bench-dupes.js",
+    "start": "node src/cli.js"
+  },
+  "keywords": [
+    "ai-agents",
+    "memory",
+    "dedup",
+    "local-first",
+    "aurora",
+    "openclaw",
+    "markdown"
+  ],
+  "homepage": "https://github.com/Zijian-Ni/memory-lens",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zijian-Ni/memory-lens.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Zijian-Ni/memory-lens/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": false
+}
