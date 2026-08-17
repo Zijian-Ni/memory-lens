@@ -1,0 +1,50 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # The viewer is plain ES modules with no build step, so the only gate
+      # before publishing is that the tests still pass.
+      - run: npm test
+
+      - name: Stage the static viewer
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -r src _site/
+          # Nothing server-side exists here; Jekyll would only get in the way.
+          touch _site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
