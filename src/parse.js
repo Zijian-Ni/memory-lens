@@ -1,7 +1,13 @@
-import fs from 'node:fs';
-import path from 'node:path';
+/**
+ * Markdown parsing.
+ *
+ * This module must stay runnable in a browser: the viewer imports it to parse
+ * dropped files, and a single `node:fs` import here takes the whole page down
+ * with a CORS error rather than a useful message. So nothing in this file may
+ * touch the filesystem or `node:path` -- the Node-only entry point lives in
+ * parse-node.js, and callers that have a real file use that instead.
+ */
 import { estimateTokens } from './tokens.js';
-import { relFrom } from './walk.js';
 
 const HEADING_RE = /^(#{1,6})\s+(.+?)\s*$/;
 const BULLET_RE = /^(\s*)([-*+]|\d+[.)])\s+(.+)$/;
@@ -12,11 +18,11 @@ const FILENAME_DATE_RE = /(20\d{2}-\d{2}-\d{2})/;
  * Parse a markdown document into heading- or bullet-scoped entries.
  * Every entry carries `file#line` provenance so a human can find and fix it.
  */
-export function parseMarkdown(text, { file = 'MEMORY.md', root = '.' } = {}) {
+export function parseMarkdown(text, { file = 'MEMORY.md', root = '.', rel: relOverride, mtime = null } = {}) {
   const lines = String(text ?? '').split(/\r?\n/);
-  const rel = file.includes(path.sep) || file.includes('/') ? relFrom(root, file) : file;
+  const rel = relOverride ?? toDisplayPath(file, root);
   const fileDate = extractFileDate(rel);
-  const fileMtime = safeMtime(file);
+  const fileMtime = mtime;
 
   /** @type {Array<{level:number, title:string, line:number}>} */
   const headingStack = [];
@@ -107,9 +113,16 @@ export function parseMarkdown(text, { file = 'MEMORY.md', root = '.' } = {}) {
   return entries;
 }
 
-export function parseFile(file, root) {
-  const text = fs.readFileSync(file, 'utf8');
-  return parseMarkdown(text, { file, root });
+/**
+ * Reduce an absolute path to something readable, without `node:path`.
+ * Provenance strings are for humans to click, so a stable relative-looking
+ * path matters more than exact platform semantics.
+ */
+function toDisplayPath(file, root) {
+  const norm = String(file).replace(/\\/g, '/');
+  const base = String(root ?? '').replace(/\\/g, '/').replace(/\/+$/, '');
+  if (base && base !== '.' && norm.startsWith(base + '/')) return norm.slice(base.length + 1);
+  return norm;
 }
 
 function makeEntry({ rel, startLine, endLine, headingPath, kind, body, fileDate, fileMtime }) {
@@ -153,14 +166,6 @@ function extractCitedDates(body) {
   let m;
   while ((m = re.exec(body))) out.push(m[1]);
   return [...new Set(out)];
-}
-
-function safeMtime(file) {
-  try {
-    return fs.statSync(file).mtime;
-  } catch {
-    return null;
-  }
 }
 
 export { ISO_DATE_RE, FILENAME_DATE_RE };

@@ -1,5 +1,6 @@
 export { inventory } from './inventory.js';
-export { parseMarkdown, parseFile } from './parse.js';
+export { parseMarkdown } from './parse.js';
+export { parseFile } from './parse-node.js';
 export { walkMarkdown } from './walk.js';
 export { estimateTokens, TOKEN_METHOD } from './tokens.js';
 export { findDuplicates, shingles, jaccard, minhash, normalizeForShingle, DUPES_DEFAULTS } from './dupes.js';

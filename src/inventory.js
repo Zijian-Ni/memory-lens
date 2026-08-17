@@ -1,5 +1,5 @@
 import { walkMarkdown } from './walk.js';
-import { parseFile } from './parse.js';
+import { parseFile } from './parse-node.js';
 import { estimateTokens, TOKEN_METHOD } from './tokens.js';
 
 /**
