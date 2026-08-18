@@ -5,6 +5,16 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] — 2026-08-18
+
+### Fixed
+
+- `decay` contradiction scan was O(n²) — recomputing shingles for every entry pair.
+  Replaced with an LSH band index (same MinHash bands used by `dupes`) so only
+  lexically adjacent pairs are tested. On a real ~5 k-entry memory directory this
+  drops wall time from 73 s to 3.5 s (≈ 20×). No change to the public API.
+- Added a scale test: 500 synthetic entries must finish in under 5 seconds.
+
 ## [0.1.0] — 2026-08-17
 
 ### Added

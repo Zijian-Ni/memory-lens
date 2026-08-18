@@ -38,4 +38,18 @@ describe('decay scoring', () => {
     const hits = detectContradiction(older, newer);
     assert.ok(hits.includes('number'), `expected number conflict, got ${hits}`);
   });
+
+  it('scoreDecay scales: 500 entries completes in under 5 seconds', () => {
+    const dir2 = writeSyntheticMemory(undefined, { large: 500 });
+    try {
+      const inv = inventory(dir2);
+      const t0 = performance.now();
+      const decay = scoreDecay(inv.items);
+      const elapsed = performance.now() - t0;
+      assert.ok(elapsed < 5000, `decay took ${elapsed.toFixed(0)} ms — expected <5000 ms`);
+      assert.ok(Array.isArray(decay.review));
+    } finally {
+      rmrf(dir2);
+    }
+  });
 });
